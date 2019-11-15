@@ -103,6 +103,7 @@ class Trainer:
         self.generator_name = generator_name
         self.discriminator_name = discriminator_name
         self.prev_chckpnt = use_older_checkpoint
+        self.pretrainval = 0
 
         self.logger = get_logger("Trainer", debug=debug)
         # NOTE: just minimal demonstration of multi-scale training
@@ -356,6 +357,7 @@ class Trainer:
 
             self.logger.info(f"Previous checkpoints has been restored.")
             trained_epochs = checkpoint.save_counter.numpy()
+            self.pretrainval = trained_epochs
             epochs = self.pretrain_epochs - trained_epochs
             if epochs <= 0:
                 self.logger.info(f"Already trained {trained_epochs} epochs. "
@@ -542,11 +544,16 @@ class Trainer:
         self.logger.info("Searching existing checkpoints: "
                          f"`{self.discriminator_checkpoint_prefix}`...")
         try:
-            d_checkpoint = tf.train.Checkpoint(d=d)
-            d_checkpoint.restore(
-                tf.train.latest_checkpoint(
-                    self.discriminator_checkpoint_dir)).assert_existing_objects_matched()
-            self.logger.info(f"Previous checkpoints has been restored.")
+            d_checkpoint = tf.train.Checkpoint(d=d):
+            if self.prev_chckpnt == 0
+                d_checkpoint.restore(
+                    tf.train.latest_checkpoint(
+                        self.discriminator_checkpoint_dir)).assert_existing_objects_matched()
+                self.logger.info(f"Previous checkpoints have been restored.")
+            else:
+                d_checkpoint.restore(
+                    os.path.join(self.discriminator_checkpoint_dir, self.discriminator_checkpoint_prefix+"-"+str(self.prev_chckpnt-self.pretrainval))).assert_existing_objects_matched()
+                self.logger.info(f"Discriminator checkpoint "+str(self.prev_chckpnt-self.pretrainval)+" has been restored.")
         except AssertionError:
             self.logger.info("specified checkpoint is not found, training from scratch...")
 
