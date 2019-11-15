@@ -62,6 +62,7 @@ class Trainer:
         generator_name,
         discriminator_name,
         debug,
+        use_older_checkpoint,
         **kwargs,
     ):
         self.debug = debug
@@ -101,6 +102,7 @@ class Trainer:
         self.pretrain_generator_name = pretrain_generator_name
         self.generator_name = generator_name
         self.discriminator_name = discriminator_name
+        self.prev_chckpnt = use_older_checkpoint
 
         self.logger = get_logger("Trainer", debug=debug)
         # NOTE: just minimal demonstration of multi-scale training
@@ -481,10 +483,16 @@ class Trainer:
         self.logger.info(f"Searching existing checkpoints: `{self.generator_checkpoint_prefix}`...")
         try:
             g_checkpoint = tf.train.Checkpoint(generator=generator)
-            g_checkpoint.restore(
-                tf.train.latest_checkpoint(
-                    self.generator_checkpoint_dir)).assert_existing_objects_matched()
-            self.logger.info(f"Previous checkpoints has been restored.")
+            if self.prev_chckpnt == 0:
+                g_checkpoint.restore(
+                    tf.train.latest_checkpoint(
+                        self.generator_checkpoint_dir)).assert_existing_objects_matched()
+                self.logger.info(f"Previous checkpoints have been restored.")
+            else:
+                g_checkpoint.restore(
+                    os.path.join(self.generator_checkpoint_dir, self.generator_checkpoint_prefix+"-"+str(self.prev_chckpnt))).assert_existing_objects_matched()
+                self.logger.info(f"Checkpoint "+str(self.prev_chckpnt)+" has been restored.")
+                
             trained_epochs = g_checkpoint.save_counter.numpy()
             epochs = self.epochs - trained_epochs
             if epochs <= 0:
@@ -680,6 +688,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pretrain_generator_name", type=str, default="pretrain_generator"
     )
+    parser.add_argument("--use_older_checkpoint", type=int, default=0)
     parser.add_argument("--generator_name", type=str, default="generator")
     parser.add_argument("--discriminator_name", type=str, default="discriminator")
     parser.add_argument("--not_show_progress_bar", action="store_true")
