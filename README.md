@@ -1,4 +1,5 @@
 # CartoonGAN-TensorFlow2
+(An edit intended to add the ability to roll back to previous checkpoints via args to train.py)
 Generate your own cartoon-style images with [CartoonGAN (CVPR 2018)](http://openaccess.thecvf.com/content_cvpr_2018/papers/Chen_CartoonGAN_Generative_Adversarial_CVPR_2018_paper.pdf), powered by [TensorFlow 2.0 Alpha](https://www.tensorflow.org/alpha).
 
 Check our blog posts with project overview, online demo and gallery of generated anime: 
