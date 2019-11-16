@@ -544,8 +544,8 @@ class Trainer:
         self.logger.info("Searching existing checkpoints: "
                          f"`{self.discriminator_checkpoint_prefix}`...")
         try:
-            d_checkpoint = tf.train.Checkpoint(d=d):
-            if self.prev_chckpnt == 0
+            d_checkpoint = tf.train.Checkpoint(d=d)
+            if self.prev_chckpnt == 0:
                 d_checkpoint.restore(
                     tf.train.latest_checkpoint(
                         self.discriminator_checkpoint_dir)).assert_existing_objects_matched()
