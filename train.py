@@ -63,6 +63,7 @@ class Trainer:
         discriminator_name,
         debug,
         use_older_checkpoint,
+        epoch_divisor,
         **kwargs,
     ):
         self.debug = debug
@@ -104,6 +105,7 @@ class Trainer:
         self.discriminator_name = discriminator_name
         self.prev_chckpnt = use_older_checkpoint
         self.pretrainval = 0
+        self.epoch_divisor = epoch_divisor
 
         self.logger = get_logger("Trainer", debug=debug)
         # NOTE: just minimal demonstration of multi-scale training
@@ -230,7 +232,7 @@ class Trainer:
                 return self.image_processing(fname, True)
 
         ds = ds.apply(tf.data.experimental.map_and_batch(fn, batch_size))
-        steps = int(np.ceil(num_images/batch_size))
+        steps = int(np.ceil((num_images/batch_size)/self.epoch_divisor))
         # user iter(ds) to avoid generating iterator every epoch
         return iter(ds), steps
 
@@ -701,6 +703,7 @@ if __name__ == "__main__":
     parser.add_argument("--not_show_progress_bar", action="store_true")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--show_tf_cpp_log", action="store_true")
+    parser.add_argument("--epoch_divisor", type=int, default=1)
 
     args = parser.parse_args()
 
