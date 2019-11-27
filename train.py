@@ -414,7 +414,7 @@ class Trainer:
 
                 if step % self.pretrain_reporting_steps == 0:
 
-                    global_step = (epoch_idx - 1) * steps_per_epoch + step
+                    global_step = (epoch_idx - 1) * (steps_per_epoch*self.epoch_divisor) + step
                     with summary_writer.as_default():
                         tf.summary.scalar('content_loss',
                                           self.content_loss_metric.result(),
@@ -601,7 +601,7 @@ class Trainer:
 
                 if step % self.reporting_steps == 0:
 
-                    global_step = (epoch_idx - 1) * steps_per_epoch + step
+                    global_step = (epoch_idx - 1) * (steps_per_epoch*self.epoch_divisor) + step
                     with summary_writer.as_default():
                         for metric, name in self.metric_and_names:
                             tf.summary.scalar(name, metric.result(), step=global_step)
