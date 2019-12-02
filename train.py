@@ -487,6 +487,7 @@ class Trainer:
         self.logger.info(f"Searching existing checkpoints: `{self.generator_checkpoint_prefix}`...")
         try:
             g_checkpoint = tf.train.Checkpoint(generator=generator)
+            g_manager = tf.train.CheckpointManager(g_checkpoint, 'self.generator_checkpoint_dir', max_to_keep=20)
             if self.prev_chckpnt == 0:
                 g_checkpoint.restore(
                     tf.train.latest_checkpoint(
@@ -547,6 +548,7 @@ class Trainer:
                          f"`{self.discriminator_checkpoint_prefix}`...")
         try:
             d_checkpoint = tf.train.Checkpoint(d=d)
+            d_manager = tf.train.CheckpointManager(d_checkpoint, 'self.discriminator_checkpoint_dir', max_to_keep=20)
             if self.prev_chckpnt == 0:
                 d_checkpoint.restore(
                     tf.train.latest_checkpoint(
